@@ -1,0 +1,45 @@
+services:
+  tyre_match_app:
+    container_name: tyre_match_app
+    build: .
+    ports:
+      - ${EXPOSE_PORT}:${PORT}
+    restart: always
+    volumes:
+      - ./:/app/
+    depends_on:
+      - tyre_match_mysql
+    env_file:
+      - .env
+    environment:
+      - DB_CONNECTION=${DB_HOST}:${DB_PORT}
+      - WAIT_HOSTS=${DB_HOST}:${DB_PORT}
+      - WAIT_BEFORE_HOSTS=7
+      - WAIT_SLEEP_INTERVAL=3
+    networks:
+      - tyre_match-stack
+
+  tyre_match_mysql:
+    image: mysql:8.0
+    container_name: tyre_match_db
+    restart: always
+    ports:
+      - ${EXPOSE_DB_PORT}:${DB_PORT}
+    environment:
+      - MYSQL_ROOT_HOST=${DB_HOST}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - database_mysql:/var/lib/mysql
+    networks:
+      - tyre_match-stack
+
+volumes:
+  database_mysql:
+
+networks:
+  tyre_match-stack:
+    driver: bridge
+
