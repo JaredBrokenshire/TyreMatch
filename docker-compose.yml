@@ -1,0 +1,46 @@
+services:
+  tyre_match_app:
+    container_name: backend
+    build: .
+    ports:
+      - ${EXPOSE_PORT}:${PORT}
+    restart: always
+    volumes:
+      - ./:/app/
+    depends_on:
+      tyre_match_mysql:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - tyre_match-stack
+
+  tyre_match_mysql:
+    container_name: database
+    image: mysql:8.0
+    restart: always
+    ports:
+      - ${EXPOSE_DB_PORT}:${DB_PORT}
+    environment:
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - database_mysql:/var/lib/mysql
+    networks:
+      - tyre_match-stack
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${DB_PASSWORD}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+volumes:
+  database_mysql:
+
+networks:
+  tyre_match-stack:
+    driver: bridge
+
