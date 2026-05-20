@@ -1,3 +1,8 @@
+##  v.0.0.2 20/05/2026
+
+### Added
+- Pytest functionality (with coverage reporting) using separate docker-compose for mock database
+
 ## v0.0.1 - 18/05/2026
 
 ### Added
